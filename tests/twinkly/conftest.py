@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.twinkly import DOMAIN
+from custom_components.twinkly import DOMAIN
 from homeassistant.const import CONF_HOST, CONF_ID, CONF_MODEL, CONF_NAME
 
 from .const import TEST_MAC, TEST_MODEL, TEST_NAME
 
-from tests.common import MockConfigEntry, load_json_object_fixture
+from pytest_homeassistant_custom_component.common import MockConfigEntry, load_json_object_fixture
 
 
 @pytest.fixture
@@ -36,28 +36,24 @@ def mock_twinkly_client() -> Generator[AsyncMock]:
     """Mock the Twinkly client."""
     with (
         patch(
-            "homeassistant.components.twinkly.Twinkly",
+            "custom_components.twinkly.Twinkly",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.twinkly.config_flow.Twinkly",
+            "custom_components.twinkly.config_flow.Twinkly",
             new=mock_client,
         ),
     ):
         client = mock_client.return_value
         client.get_details.return_value = load_json_object_fixture(
-            "get_details.json", DOMAIN
-        )
+            "get_details.json")
         client.get_firmware_version.return_value = load_json_object_fixture(
-            "get_firmware_version.json", DOMAIN
-        )
+            "get_firmware_version.json")
         client.get_saved_movies.return_value = load_json_object_fixture(
-            "get_saved_movies.json", DOMAIN
-        )
+            "get_saved_movies.json")
         client.get_current_movie.return_value = load_json_object_fixture(
-            "get_current_movie.json", DOMAIN
-        )
-        client.get_mode.return_value = load_json_object_fixture("get_mode.json", DOMAIN)
+            "get_current_movie.json")
+        client.get_mode.return_value = load_json_object_fixture("get_mode.json")
         client.is_on.return_value = True
         client.get_brightness.return_value = {"mode": "enabled", "value": 10}
         client.host = "192.168.0.123"
@@ -67,5 +63,5 @@ def mock_twinkly_client() -> Generator[AsyncMock]:
 @pytest.fixture
 def mock_setup_entry() -> Generator[None]:
     """Mock setting up a config entry."""
-    with patch("homeassistant.components.twinkly.async_setup_entry", return_value=True):
+    with patch("custom_components.twinkly.async_setup_entry", return_value=True):
         yield

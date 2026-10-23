@@ -6,7 +6,7 @@ from aiohttp import ClientConnectionError
 import pytest
 
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.twinkly.const import DOMAIN
+from custom_components.twinkly.const import DOMAIN
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_HOST, CONF_ID, CONF_MODEL, CONF_NAME
 from homeassistant.core import HomeAssistant
@@ -15,7 +15,7 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 from . import setup_integration
 from .const import TEST_MAC, TEST_MODEL
 
-from tests.common import MockConfigEntry, async_load_json_object_fixture
+from pytest_homeassistant_custom_component.common import MockConfigEntry, async_load_json_object_fixture
 
 
 @pytest.mark.usefixtures("mock_twinkly_client")
@@ -93,7 +93,7 @@ async def test_request_retried_once_on_timeout(
     mock_twinkly_client: AsyncMock,
 ) -> None:
     """A request that times out once is retried, so setup still succeeds."""
-    details = await async_load_json_object_fixture(hass, "get_details.json", DOMAIN)
+    details = await async_load_json_object_fixture(hass, "get_details.json")
     # Only the first call times out; without the retry setup would fail here.
     mock_twinkly_client.get_details.side_effect = [TimeoutError, details, details]
 

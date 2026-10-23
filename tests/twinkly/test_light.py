@@ -17,7 +17,7 @@ from homeassistant.components.light import (
     DOMAIN as LIGHT_DOMAIN,
     LightEntityFeature,
 )
-from homeassistant.components.twinkly import DOMAIN
+from custom_components.twinkly import DOMAIN
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
@@ -33,7 +33,7 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 from . import setup_integration
 from .const import TEST_MAC
 
-from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
+from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
 
 
 @pytest.mark.usefixtures("mock_twinkly_client")
@@ -44,7 +44,7 @@ async def test_entities(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the created entities."""
-    with patch("homeassistant.components.twinkly.PLATFORMS", [Platform.LIGHT]):
+    with patch("custom_components.twinkly.PLATFORMS", [Platform.LIGHT]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)

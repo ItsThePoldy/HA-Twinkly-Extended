@@ -14,7 +14,7 @@ from homeassistant.helpers import entity_registry as er
 
 from . import setup_integration
 
-from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
+from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
 
 
 @pytest.mark.usefixtures("mock_twinkly_client")
@@ -25,7 +25,7 @@ async def test_select_entities(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the created select entities."""
-    with patch("homeassistant.components.twinkly.PLATFORMS", [Platform.SELECT]):
+    with patch("custom_components.twinkly.PLATFORMS", [Platform.SELECT]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)

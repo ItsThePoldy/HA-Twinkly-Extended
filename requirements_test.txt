@@ -1,0 +1,3 @@
+# phacc pins one exact Home Assistant release; this pin selects the HA version the suite runs against.
+pytest-homeassistant-custom-component==0.13.373
+ttls==1.11.1

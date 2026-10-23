@@ -1,0 +1,8 @@
+HA-Twinkly-Extended
+Copyright the HA-Twinkly-Extended contributors
+
+This product is derived from the Twinkly integration of Home Assistant
+(https://github.com/home-assistant/core, homeassistant/components/twinkly),
+Copyright the Home Assistant authors, licensed under the Apache License 2.0.
+The unmodified upstream source is kept on the `upstream` branch; see UPSTREAM
+for the exact core revision.
