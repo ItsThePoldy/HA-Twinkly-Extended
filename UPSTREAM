@@ -1,0 +1,3 @@
+home-assistant/core 2026.10.2 (8d7fd8b68677c2585be36ec86043308f403875b8, 2026-10-16)
+homeassistant/components/twinkly -> custom_components/twinkly
+tests/components/twinkly         -> tests/twinkly
