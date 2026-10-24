@@ -6,6 +6,8 @@ between minor versions.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-24
+
 ### Added
 - Predefined device effects (`effect` mode) in the light's effect list, after
   the movies. Names come from `effect_names.yaml`, one rule per device variant;
