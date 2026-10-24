@@ -54,6 +54,10 @@ def mock_twinkly_client() -> Generator[AsyncMock]:
         client.get_current_movie.return_value = load_json_object_fixture(
             "get_current_movie.json")
         client.get_mode.return_value = load_json_object_fixture("get_mode.json")
+        client.get_predefined_effects.return_value = load_json_object_fixture(
+            "get_predefined_effects.json")
+        client.get_current_predefined_effect.return_value = load_json_object_fixture(
+            "get_current_predefined_effect.json")
         client.is_on.return_value = True
         client.get_brightness.return_value = {"mode": "enabled", "value": 10}
         client.host = "192.168.0.123"

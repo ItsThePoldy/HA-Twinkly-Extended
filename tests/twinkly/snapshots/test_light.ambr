@@ -9,6 +9,8 @@
       <LightEntityCapabilityAttribute.EFFECT_LIST: 'effect_list'>: list([
         '1 Rainbow',
         '2 Flare',
+        'Effect 1',
+        'Effect 2',
       ]),
       <LightEntityCapabilityAttribute.SUPPORTED_COLOR_MODES: 'supported_color_modes'>: list([
         <ColorMode.RGB: 'rgb'>,
@@ -53,6 +55,8 @@
       <LightEntityCapabilityAttribute.EFFECT_LIST: 'effect_list'>: list([
         '1 Rainbow',
         '2 Flare',
+        'Effect 1',
+        'Effect 2',
       ]),
       <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Tree 1',
       <LightEntityStateAttribute.HS_COLOR: 'hs_color'>: tuple(

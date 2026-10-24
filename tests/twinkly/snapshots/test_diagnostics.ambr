@@ -8,6 +8,8 @@
       'effect_list': list([
         '1 Rainbow',
         '2 Flare',
+        'Effect 1',
+        'Effect 2',
       ]),
       'friendly_name': 'Tree 1',
       'hs_color': list([
@@ -74,6 +76,14 @@
       'title': 'Twinkly',
       'unique_id': '00:2d:13:3b:aa:bb',
       'version': 1,
+    }),
+    'predefined_effect_ids': list([
+      '00000000-0000-0000-0000-000000000001',
+      '00000000-0000-0000-0000-000000000002',
+    ]),
+    'predefined_effects': dict({
+      '0': 'Effect 1',
+      '1': 'Effect 2',
     }),
     'sw_version': '2.7.2',
   })

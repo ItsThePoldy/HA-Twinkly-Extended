@@ -9,6 +9,7 @@ from typing import Any, override
 from aiohttp import ClientError
 from awesomeversion import AwesomeVersion
 from ttls.client import Twinkly, TwinklyError
+import yaml
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -16,6 +17,7 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import DEV_NAME, DOMAIN, MIN_EFFECT_VERSION
+from .effect_names import EffectNameRule, load_rules, resolve_effect_names
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,6 +34,8 @@ class TwinklyData:
     movies: dict[int, str]
     current_movie: int | None
     current_mode: str | None
+    predefined_effects: dict[int, str]
+    current_predefined_effect: int | None
 
 
 class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
@@ -41,6 +45,11 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
     software_version: str
     supports_effects: bool
     device_name: str
+    effect_name_rules: list[EffectNameRule]
+    # Unique ids of the predefined effects in device order; None until the
+    # device has answered once. The list only changes with the firmware.
+    predefined_effect_ids: list[str] | None = None
+    supports_predefined_effects: bool = False
 
     def __init__(
         self, hass: HomeAssistant, config_entry: TwinklyConfigEntry, client: Twinkly
@@ -67,6 +76,12 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
         self.supports_effects = AwesomeVersion(self.software_version) >= AwesomeVersion(
             MIN_EFFECT_VERSION
         )
+        try:
+            self.effect_name_rules = await self.hass.async_add_executor_job(load_rules)
+        except (OSError, ValueError, yaml.YAMLError) as exception:
+            # Names are cosmetic: every effect stays usable under "Effect <n>".
+            _LOGGER.error("Effect names unavailable: %s", exception)
+            self.effect_name_rules = []
 
     async def _request[_T](self, request: Callable[[], Awaitable[_T]]) -> _T:
         """Make a request, retrying it once if it times out.
@@ -101,6 +116,10 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
                 current_movie = await self._request(self.client.get_current_movie)
             except (TwinklyError, TimeoutError, ClientError) as exception:
                 _LOGGER.debug("Error fetching current movie: %s", exception)
+            await self._async_fetch_predefined_effect_ids()
+        current_predefined_effect = None
+        if self.supports_predefined_effects and current_mode == "effect":
+            current_predefined_effect = await self._async_fetch_current_predefined()
         brightness = (
             int(brightness["value"]) if brightness["mode"] == "enabled" else 100
         )
@@ -114,7 +133,45 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
             {movie["id"]: movie["name"] for movie in movies},
             current_movie.get("id"),
             current_mode,
+            resolve_effect_names(
+                self.effect_name_rules, device_info, self.predefined_effect_ids or []
+            ),
+            current_predefined_effect,
         )
+
+    async def _async_fetch_predefined_effect_ids(self) -> None:
+        """Read the device's predefined effects once it answers.
+
+        A device on API v2 has no predefined-effect endpoint (ttls raises
+        NotImplementedError); that answer is final. Any other failure leaves
+        the ids unset so the next update asks again.
+        """
+        if self.predefined_effect_ids is not None:
+            return
+        try:
+            response = await self._request(self.client.get_predefined_effects)
+        except NotImplementedError:
+            self.predefined_effect_ids = []
+            return
+        except (TwinklyError, TimeoutError, ClientError) as exception:
+            _LOGGER.debug("Error fetching predefined effects: %s", exception)
+            return
+        self.predefined_effect_ids = [str(uid) for uid in response.get("unique_ids", [])]
+        self.supports_predefined_effects = bool(self.predefined_effect_ids)
+
+    async def _async_fetch_current_predefined(self) -> int | None:
+        """Return the index of the running predefined effect.
+
+        Firmware 2.11 reports it as preset_id although it is set as effect_id;
+        effect_id is read as well for firmware that answers in that field.
+        """
+        try:
+            response = await self._request(self.client.get_current_predefined_effect)
+        except (NotImplementedError, TwinklyError, TimeoutError, ClientError) as exception:
+            _LOGGER.debug("Error fetching current predefined effect: %s", exception)
+            return None
+        index = response.get("preset_id", response.get("effect_id"))
+        return index if isinstance(index, int) else None
 
     def _async_update_device_info(self, name: str) -> None:
         """Update the device info."""

@@ -65,20 +65,30 @@ class TwinklyLight(TwinklyEntity, LightEntity):
     @override
     def effect(self) -> str | None:
         """Return the current effect."""
-        if (current_movie_id := self.coordinator.data.current_movie) is not None:
-            return (
-                f"{current_movie_id} {self.coordinator.data.movies[current_movie_id]}"
-            )
+        data = self.coordinator.data
+        if data.current_mode == "effect":
+            if data.current_predefined_effect is None:
+                return None
+            return data.predefined_effects.get(data.current_predefined_effect)
+        if (current_movie_id := data.current_movie) is not None:
+            return f"{current_movie_id} {data.movies[current_movie_id]}"
         return None
 
     @property
     @override
     def effect_list(self) -> list[str]:
-        """Return the list of saved effects."""
+        """Return the saved movies as "<id> <name>", then the predefined effects."""
         return [
             f"{identifier} {name}"
             for identifier, name in self.coordinator.data.movies.items()
-        ]
+        ] + list(self.coordinator.data.predefined_effects.values())
+
+    def _predefined_effect_index(self, effect: str) -> int | None:
+        """Return the device index of a predefined effect name, if it is one."""
+        for index, name in self.coordinator.data.predefined_effects.items():
+            if name == effect:
+                return index
+        return None
 
     @override
     async def async_turn_on(self, **kwargs: Any) -> None:
@@ -137,6 +147,19 @@ class TwinklyLight(TwinklyEntity, LightEntity):
             self._attr_rgb_color = kwargs[ATTR_RGB_COLOR]
 
         if (
+            ATTR_EFFECT in kwargs
+            and LightEntityFeature.EFFECT & self.supported_features
+            and (index := self._predefined_effect_index(kwargs[ATTR_EFFECT]))
+            is not None
+        ):
+            if (
+                self.coordinator.data.current_mode != "effect"
+                or index != self.coordinator.data.current_predefined_effect
+            ):
+                await self.client.set_current_predefined_effect(index)
+                await self.client.set_mode("effect")
+                self.client.default_mode = "effect"
+        elif (
             ATTR_EFFECT in kwargs
             and LightEntityFeature.EFFECT & self.supported_features
         ):

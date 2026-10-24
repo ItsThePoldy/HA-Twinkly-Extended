@@ -18,13 +18,36 @@ already supports them. This project adds them.
 | Colour (RGB / RGBW incl. white channel) | ✅ | ✅ |
 | Movies uploaded via the Twinkly app | ✅ | ✅ |
 | Mode select (color, movie, playlist, …) | ✅ | ✅ |
-| Predefined device effects (`effect` mode) | ❌ | 🚧 planned |
+| Predefined device effects (`effect` mode) | ❌ | ✅ |
 | Selecting a playlist entry | ❌ | 🚧 planned |
 | Music mode | ❌ | 🚧 planned |
 
-The current release is the built-in integration of Home Assistant 2026.10.2,
-packaged as a custom integration; the features marked planned land in the
-upcoming `0.x` releases. See [CHANGELOG.md](CHANGELOG.md).
+The integration is based on the built-in one of Home Assistant 2026.10.2.
+See [CHANGELOG.md](CHANGELOG.md) for what each release adds.
+
+## Predefined effects
+
+Twinkly devices ship a few built-in effects besides the movies you upload with
+the app. They appear in the light's effect list after the movies:
+
+```
+1 Rainbow        ← movie uploaded with the app ("<id> <name>", unchanged)
+2 Flare
+Rainbow          ← predefined effect
+Silver Shower
+…
+```
+
+The device reports these effects without names, so names come from
+[`effect_names.yaml`](custom_components/twinkly/effect_names.yaml), with one rule
+per device variant. A device without a rule shows its effects as `Effect 1`,
+`Effect 2`, …. Devices on Twinkly's newer API (v2) have no predefined effects.
+
+**Your device shows `Effect 1`, `Effect 2`?** Open an issue with the diagnostics
+download of the device (Settings → Devices & services → Twinkly → ⋮ → Download
+diagnostics) and the name of each effect as you see it. That is everything a
+new rule needs. Measurements behind the existing rules:
+[docs/device-notes.md](docs/device-notes.md).
 
 ## Installation (HACS)
 

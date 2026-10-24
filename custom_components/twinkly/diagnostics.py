@@ -34,6 +34,10 @@ async def async_get_config_entry_diagnostics(
             "entry": entry.as_dict(),
             "device_info": entry.runtime_data.data.device_info,
             ATTR_SW_VERSION: entry.runtime_data.software_version,
+            # What a new effect_names.yaml rule needs: match fields are in
+            # device_info, the ids here in device order.
+            "predefined_effect_ids": entry.runtime_data.predefined_effect_ids,
+            "predefined_effects": entry.runtime_data.data.predefined_effects,
             "attributes": attributes,
         },
         TO_REDACT,

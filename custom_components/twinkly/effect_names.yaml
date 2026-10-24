@@ -1,0 +1,21 @@
+# Display names for the predefined effects of Twinkly devices.
+#
+# Each rule matches device fields from the details (gestalt) endpoint; the
+# matching rule with the most fields wins. Allowed match fields: product_code,
+# hardware_version, fw_family, led_profile.
+#
+# effects maps a predefined effect's unique_id to its name. null hides the
+# effect on that variant; an id a rule does not list is shown as "Effect <n>".
+#
+# Measurements behind each rule: docs/device-notes.md. A rule for a new device
+# needs the diagnostics download of that device (Settings → Devices & services →
+# Twinkly → ⋮ → Download diagnostics), which lists its fields and effect ids.
+
+- match:
+    product_code: TWW210SPP2
+  effects:
+    "00000000-0000-0000-0000-000000000001": Rainbow
+    "00000000-0000-0000-0000-000000000002": Silver Shower
+    "00000000-0000-0000-0000-000000000003": Color Glow
+    "00000000-0000-0000-0000-000000000004": Fireworks
+    "00000000-0000-0000-0000-000000000005": Spring Glow
