@@ -82,6 +82,13 @@ client. The integration therefore steps aside:
   shows an automatic pause, and turning it off resumes polling at once.
 - A command from Home Assistant (light, mode) ends a pause and takes the device
   back.
+- **App proxy request.** If a directory is mounted at `/twinkly-proxy` inside
+  Home Assistant, app mode keeps an empty file named after the device's host
+  (e.g. `/twinkly-proxy/10.1.9.80`) there for as long as it is on, and removes
+  it when app mode ends (switch off, timeout, a command from Home Assistant) and
+  when the integration starts. A host-side service can watch that file, for
+  example to make the device reachable for the app from another network while
+  app mode is on. Without the directory nothing is written.
 
 ## Development
 

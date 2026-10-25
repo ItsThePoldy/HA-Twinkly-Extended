@@ -5,6 +5,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import logging
+from pathlib import Path
 from typing import Any, override
 
 from aiohttp import ClientError
@@ -42,8 +43,28 @@ APP_MODE_DURATION = timedelta(minutes=30)
 # this soon after the previous one was forced by a 401: another client took it.
 FORCED_LOGIN_WITHIN = timedelta(hours=3, minutes=50)
 
+# While app mode is on, a proxy on the host can make the device reachable for the
+# Twinkly app from another network. When this directory is mounted into Home
+# Assistant, app mode keeps a file named after the device's host in it, and the
+# proxy runs while that file exists. Without the directory nothing is written.
+APP_PROXY_DIR = Path("/twinkly-proxy")
+
 PAUSE_OTHER_CLIENT = "other_client"
 PAUSE_APP_MODE = "app_mode"
+
+
+def _write_proxy_request(host: str, active: bool) -> None:
+    """Create or remove the proxy request file for host, if the directory is there."""
+    if not APP_PROXY_DIR.is_dir():
+        return
+    path = APP_PROXY_DIR / Path(host).name
+    try:
+        if active:
+            path.touch()
+        else:
+            path.unlink(missing_ok=True)
+    except OSError as exception:
+        _LOGGER.warning("Cannot update the app proxy request %s: %s", path, exception)
 
 
 @dataclass
@@ -130,11 +151,14 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
     def pause_for_app(self) -> None:
         """Stop polling for APP_MODE_DURATION so another client can keep the token."""
         self._pause(dt_util.utcnow() + APP_MODE_DURATION, PAUSE_APP_MODE)
+        self.hass.async_add_executor_job(_write_proxy_request, self.client.host, True)
 
     def end_pause(self) -> None:
         """Resume polling now; a command from Home Assistant takes the device back."""
         if self.paused_until is None:
             return
+        if self.pause_reason == PAUSE_APP_MODE:
+            self.hass.async_add_executor_job(_write_proxy_request, self.client.host, False)
         self.paused_until = None
         self.pause_reason = None
         self._takeovers.clear()
@@ -148,6 +172,8 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
             self.device_name = (await self._request(self.client.get_details))[DEV_NAME]
         except (TimeoutError, ClientError) as exception:
             raise UpdateFailed from exception
+        # App mode does not survive a restart, so neither may its proxy request.
+        await self.hass.async_add_executor_job(_write_proxy_request, self.client.host, False)
         self.software_version = software_version["version"]
         self.supports_effects = AwesomeVersion(self.software_version) >= AwesomeVersion(
             MIN_EFFECT_VERSION
