@@ -6,6 +6,18 @@ between minor versions.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-25
+
+### Added
+- `Animation` select in the controls: the device's movies, then its predefined
+  effects; choosing one plays it (and turns the device on).
+- German translation.
+
+### Changed
+- `Mode` and the library select (now named `Upload from library`) are
+  configuration entities, beside `Delete movie` and `App mode`. Existing entity
+  ids are kept.
+
 ## [0.5.0] - 2026-10-25
 
 ### Added
