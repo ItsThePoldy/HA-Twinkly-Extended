@@ -8,6 +8,12 @@
     "select": {
       "mode": {
         "default": "mdi:cogs"
+      },
+      "library": {
+        "default": "mdi:bookshelf"
+      },
+      "delete_movie": {
+        "default": "mdi:delete"
       }
     }
   }

@@ -2,7 +2,7 @@
 
 from collections import deque
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 import logging
 from pathlib import Path
@@ -21,6 +21,7 @@ from homeassistant.util import dt as dt_util
 
 from .const import DEV_NAME, DOMAIN, MIN_EFFECT_VERSION
 from .effect_names import EffectNameRule, load_rules, resolve_effect_names
+from .movies import LibraryMovie, library_mounted, read_library
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -79,6 +80,10 @@ class TwinklyData:
     current_mode: str | None
     predefined_effects: dict[int, str]
     current_predefined_effect: int | None
+    # The saved movies as the device lists them (with unique_id and frame counts).
+    movie_list: list[dict[str, Any]] = field(default_factory=list)
+    # None when no library is mounted.
+    library: list[LibraryMovie] | None = None
 
 
 class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
@@ -93,6 +98,7 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
     # device has answered once. The list only changes with the firmware.
     predefined_effect_ids: list[str] | None = None
     supports_predefined_effects: bool = False
+    library_mounted: bool = False
 
     def __init__(
         self, hass: HomeAssistant, config_entry: TwinklyConfigEntry, client: Twinkly
@@ -174,6 +180,7 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
             raise UpdateFailed from exception
         # App mode does not survive a restart, so neither may its proxy request.
         await self.hass.async_add_executor_job(_write_proxy_request, self.client.host, False)
+        self.library_mounted = await self.hass.async_add_executor_job(library_mounted)
         self.software_version = software_version["version"]
         self.supports_effects = AwesomeVersion(self.software_version) >= AwesomeVersion(
             MIN_EFFECT_VERSION
@@ -235,6 +242,9 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
             int(brightness["value"]) if brightness["mode"] == "enabled" else 100
         )
         brightness = round(brightness * 2.55) if is_on else 0
+        library = None
+        if self.supports_effects and self.library_mounted:
+            library = await self.hass.async_add_executor_job(read_library, device_info)
         if self.device_name != device_info[DEV_NAME]:
             self._async_update_device_info(device_info[DEV_NAME])
         return TwinklyData(
@@ -248,6 +258,8 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
                 self.effect_name_rules, device_info, self.predefined_effect_ids or []
             ),
             current_predefined_effect,
+            movies,
+            library,
         )
 
     async def _async_fetch_predefined_effect_ids(self) -> None:

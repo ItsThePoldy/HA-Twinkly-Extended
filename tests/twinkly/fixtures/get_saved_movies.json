@@ -2,11 +2,24 @@
   "movies": [
     {
       "id": 1,
-      "name": "Rainbow"
+      "name": "Rainbow",
+      "unique_id": "11111111-aaaa-4aaa-8aaa-111111111111",
+      "descriptor_type": "rgb_raw",
+      "leds_per_frame": 100,
+      "frames_number": 40,
+      "fps": 12
     },
     {
       "id": 2,
-      "name": "Flare"
+      "name": "Flare",
+      "unique_id": "22222222-bbbb-4bbb-8bbb-222222222222",
+      "descriptor_type": "rgb_raw",
+      "leds_per_frame": 100,
+      "frames_number": 30,
+      "fps": 12
     }
-  ]
+  ],
+  "available_frames": 638,
+  "max_capacity": 708,
+  "code": 1000
 }

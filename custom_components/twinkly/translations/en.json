@@ -35,6 +35,12 @@
           "playlist": "Playlist",
           "rt": "Real time"
         }
+      },
+      "library": {
+        "name": "Library"
+      },
+      "delete_movie": {
+        "name": "Delete movie"
       }
     },
     "switch": {

@@ -90,6 +90,23 @@ client. The integration therefore steps aside:
   example to make the device reachable for the app from another network while
   app mode is on. Without the directory nothing is written.
 
+## Movies on the device
+
+- **`Delete movie` select** (configuration entity): lists the movies saved on the
+  device; choosing one deletes it at once, there is no confirmation. The LEDs are
+  switched off for the delete and return to their mode afterwards, as the Twinkly
+  app does it. Needs firmware 2.7.1 or newer.
+- **`Library` select** — only if a directory is mounted at `/twinkly-library`
+  inside Home Assistant. It holds recorded uploads of the Twinkly app, one shelf
+  per `<product_code>-<number_of_led>` and one directory per movie with
+  `movie.json` (the app's `movies/new` request plus `bytes_per_led`, `size`,
+  `sha256`) and `frames.bin`. The select lists the shelf's movies that fit the
+  device's LED count and colour profile. Choosing one plays it; a movie the device
+  does not have is uploaded first, after its frames are checked against the
+  recorded hash. If the device has too few free frames, nothing is uploaded and
+  the error names how many are missing: delete a movie first. The library is
+  read on every poll, so new recordings appear within 30 s.
+
 ## Development
 
 ```bash
