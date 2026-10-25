@@ -6,6 +6,14 @@ between minor versions.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-25
+
+### Added
+- App proxy request: when `/twinkly-proxy` is a directory inside Home Assistant,
+  app mode keeps an empty file named after the device's host in it while app
+  mode is on, so a host-side service can follow app mode. The file is removed
+  when app mode ends and at startup; an automatic pause never writes it.
+
 ## [0.3.0] - 2026-10-25
 
 ### Added
