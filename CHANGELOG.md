@@ -6,6 +6,21 @@ between minor versions.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-25
+
+### Added
+- The integration yields the device's session token to other clients. A device
+  keeps one token, and the library logs in again on every 401, so polling used
+  to throw the Twinkly app out within 30 s. Two token takeovers within 5 minutes
+  now pause polling for 10 minutes, doubling (up to 60 minutes) while the other
+  client stays. A single takeover, as one command from a wall panel causes,
+  pauses nothing.
+- `App mode` switch: pauses polling for 30 minutes so the Twinkly app can stay
+  connected, for example to upload new effects. It also reads on during an
+  automatic pause (attribute `reason`: `app_mode` or `other_client`, `until`);
+  turning it off resumes polling at once. A light or mode command from Home
+  Assistant ends a pause as well.
+
 ## [0.2.0] - 2026-10-24
 
 ### Added

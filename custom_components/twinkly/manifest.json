@@ -17,5 +17,5 @@
   "issue_tracker": "https://github.com/ItsThePoldy/HA-Twinkly-Extended/issues",
   "loggers": ["ttls"],
   "requirements": ["ttls>=1.11.1"],
-  "version": "0.2.0"
+  "version": "0.3.0"
 }
