@@ -19,6 +19,7 @@ already supports them. This project adds them.
 | Movies uploaded via the Twinkly app | ✅ | ✅ |
 | Mode select (color, movie, playlist, …) | ✅ | ✅ |
 | Predefined device effects (`effect` mode) | ❌ | ✅ |
+| Leaves the device to the Twinkly app (`App mode`) | ❌ | ✅ |
 | Selecting a playlist entry | ❌ | 🚧 planned |
 | Music mode | ❌ | 🚧 planned |
 
@@ -70,8 +71,17 @@ stay compatible with the built-in version.
 
 A Twinkly device accepts **one authentication token at a time**: when another
 client logs in (the Twinkly app, a second Home Assistant instance, a script),
-the previous token is invalidated. The integration logs in again automatically,
-but two clients polling the same device will keep displacing each other.
+the previous token is invalidated, and logging in again takes it back from that
+client. The integration therefore steps aside:
+
+- When another client takes the token twice within 5 minutes, polling pauses for
+  10 minutes, and twice as long each time that client is still there afterwards
+  (up to 60 minutes). The entities keep their last state meanwhile.
+- The `App mode` switch pauses polling for 30 minutes on demand — turn it on
+  before opening the Twinkly app, for example to upload new effects. It also
+  shows an automatic pause, and turning it off resumes polling at once.
+- A command from Home Assistant (light, mode) ends a pause and takes the device
+  back.
 
 ## Development
 

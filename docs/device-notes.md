@@ -15,6 +15,10 @@ Measured 2026-10-24. `gestalt`: hardware_version 308, `led_profile: RGBW`,
   `detect_api_version()` tries v1 first, so the predefined-effect methods
   (v1-only in `ttls`) are available.
 - Login token lifetime: `authentication_token_expires_in: 14400` (4 h).
+- One token per device: a second login invalidates the first at once (the
+  first client's next call answers 401), measured with two logins in a row.
+  Home Assistant's poll then logs in again within 30 s and invalidates the
+  second client's token in turn.
 - Current movie: `movies/current`. `led/movies/current` returns 404.
 - `led/mode` in movie mode also returns the current movie's `id`, `unique_id`
   and `name`.

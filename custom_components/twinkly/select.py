@@ -46,5 +46,6 @@ class TwinklyModeSelect(TwinklyEntity, SelectEntity):
     @override
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
+        self.coordinator.end_pause()
         await self.client.set_mode(option)
         await self.coordinator.async_refresh()

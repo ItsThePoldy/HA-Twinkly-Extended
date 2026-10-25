@@ -1,8 +1,9 @@
 """Coordinator for Twinkly."""
 
+from collections import deque
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 import logging
 from typing import Any, override
 
@@ -15,6 +16,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.util import dt as dt_util
 
 from .const import DEV_NAME, DOMAIN, MIN_EFFECT_VERSION
 from .effect_names import EffectNameRule, load_rules, resolve_effect_names
@@ -22,6 +24,26 @@ from .effect_names import EffectNameRule, load_rules, resolve_effect_names
 _LOGGER = logging.getLogger(__name__)
 
 type TwinklyConfigEntry = ConfigEntry[TwinklyCoordinator]
+
+# A Twinkly device keeps one session token: a login by any client invalidates the
+# previous one. The library logs in again on every 401, so while another client
+# (the Twinkly app, a wall panel) uses the device, each poll takes the token back
+# and throws that client out. The coordinator therefore yields: TAKEOVERS_TO_YIELD
+# token takeovers within TAKEOVER_WINDOW pause polling, for YIELD_FIRST and twice
+# as long each time the other client is still there afterwards (up to YIELD_MAX).
+# A single takeover, as a panel causes with one command, does not pause anything.
+TAKEOVER_WINDOW = timedelta(minutes=5)
+TAKEOVERS_TO_YIELD = 2
+YIELD_FIRST = timedelta(minutes=10)
+YIELD_MAX = timedelta(minutes=60)
+# How long the app mode switch pauses polling when turned on.
+APP_MODE_DURATION = timedelta(minutes=30)
+# A token lives 14400 s and the library renews it only once expired, so a login
+# this soon after the previous one was forced by a 401: another client took it.
+FORCED_LOGIN_WITHIN = timedelta(hours=3, minutes=50)
+
+PAUSE_OTHER_CLIENT = "other_client"
+PAUSE_APP_MODE = "app_mode"
 
 
 @dataclass
@@ -63,6 +85,60 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
             update_interval=timedelta(seconds=30),
         )
         self.client = client
+        self.paused_until: datetime | None = None
+        self.pause_reason: str | None = None
+        self._takeovers: deque[datetime] = deque()
+        self._last_takeover: datetime | None = None
+        self._last_login: datetime | None = None
+        self._yield_count = 0
+        # Every login goes through refresh_token, both the one the library does on
+        # expiry and the one it forces after a 401; observe it to count takeovers.
+        self._refresh_token = client.refresh_token
+        client.refresh_token = self._async_refresh_token  # type: ignore[method-assign]
+
+    async def _async_refresh_token(self) -> None:
+        """Log in through the library and count logins forced by another client."""
+        now = dt_util.utcnow()
+        if self._last_login is not None and now - self._last_login < FORCED_LOGIN_WITHIN:
+            self._record_takeover(now)
+        await self._refresh_token()
+        self._last_login = now
+
+    def _record_takeover(self, now: datetime) -> None:
+        """Note that another client had taken the token; yield if it keeps doing so."""
+        self._last_takeover = now
+        self._takeovers.append(now)
+        while self._takeovers and now - self._takeovers[0] > TAKEOVER_WINDOW:
+            self._takeovers.popleft()
+        if len(self._takeovers) < TAKEOVERS_TO_YIELD or self.paused_until is not None:
+            return
+        duration = min(YIELD_FIRST * 2**self._yield_count, YIELD_MAX)
+        self._yield_count += 1
+        self._takeovers.clear()
+        _LOGGER.info(
+            "Another client keeps taking the session token of %s; pausing polling for %s",
+            self.client.host,
+            duration,
+        )
+        self._pause(now + duration, PAUSE_OTHER_CLIENT)
+
+    def _pause(self, until: datetime, reason: str) -> None:
+        self.paused_until = until
+        self.pause_reason = reason
+        self.async_update_listeners()
+
+    def pause_for_app(self) -> None:
+        """Stop polling for APP_MODE_DURATION so another client can keep the token."""
+        self._pause(dt_util.utcnow() + APP_MODE_DURATION, PAUSE_APP_MODE)
+
+    def end_pause(self) -> None:
+        """Resume polling now; a command from Home Assistant takes the device back."""
+        if self.paused_until is None:
+            return
+        self.paused_until = None
+        self.pause_reason = None
+        self._takeovers.clear()
+        self.async_update_listeners()
 
     @override
     async def _async_setup(self) -> None:
@@ -99,6 +175,15 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
     @override
     async def _async_update_data(self) -> TwinklyData:
         """Fetch data from Twinkly."""
+        now = dt_util.utcnow()
+        if self.paused_until is not None:
+            if now < self.paused_until:
+                # Not contacting the device is the point of the pause; the
+                # entities keep showing the last state read.
+                return self.data
+            self.end_pause()
+        elif self._last_takeover is None or now - self._last_takeover > YIELD_MAX:
+            self._yield_count = 0
         movies: list[dict[str, Any]] = []
         current_movie: dict[str, Any] = {}
         try:

@@ -36,6 +36,23 @@
           "rt": "Real time"
         }
       }
+    },
+    "switch": {
+      "app_mode": {
+        "name": "App mode",
+        "state_attributes": {
+          "reason": {
+            "name": "Reason",
+            "state": {
+              "app_mode": "App mode",
+              "other_client": "Another client is using the device"
+            }
+          },
+          "until": {
+            "name": "Paused until"
+          }
+        }
+      }
     }
   }
 }

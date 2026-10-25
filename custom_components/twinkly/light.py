@@ -93,6 +93,7 @@ class TwinklyLight(TwinklyEntity, LightEntity):
     @override
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn device on."""
+        self.coordinator.end_pause()
         if ATTR_BRIGHTNESS in kwargs:
             brightness = int(int(kwargs[ATTR_BRIGHTNESS]) / 2.55)
 
@@ -179,6 +180,7 @@ class TwinklyLight(TwinklyEntity, LightEntity):
     @override
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn device off."""
+        self.coordinator.end_pause()
         await self.client.turn_off()
         await self.coordinator.async_refresh()
 
