@@ -32,7 +32,9 @@ def proxy_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 async def _switch(hass: HomeAssistant, service: str) -> None:
     await hass.services.async_call(SWITCH_DOMAIN, service, {ATTR_ENTITY_ID: SWITCH}, blocking=True)
-    await hass.async_block_till_done()
+    # The request file is written by an executor job that is not awaited; called
+    # from the test task it lands among the background tasks.
+    await hass.async_block_till_done(wait_background_tasks=True)
 
 
 async def test_app_mode_writes_and_removes_the_request(
@@ -73,7 +75,7 @@ async def test_light_command_removes_the_request(
     await _switch(hass, SERVICE_TURN_ON)
     assert (proxy_dir / HOST).is_file()
     await hass.services.async_call(LIGHT_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: LIGHT}, blocking=True)
-    await hass.async_block_till_done()
+    await hass.async_block_till_done(wait_background_tasks=True)
     assert not (proxy_dir / HOST).exists()
 
 

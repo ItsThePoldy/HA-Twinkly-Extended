@@ -37,7 +37,9 @@ LIGHT = "light.tree_1"
 async def _poll(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
     freezer.tick(POLL)
     async_fire_time_changed(hass)
-    await hass.async_block_till_done()
+    # The coordinator polls in a background task, which a plain block_till_done
+    # does not wait for once the poll awaits anything real (the library read).
+    await hass.async_block_till_done(wait_background_tasks=True)
 
 
 def _take_token_on_next_poll(client: AsyncMock) -> None:
