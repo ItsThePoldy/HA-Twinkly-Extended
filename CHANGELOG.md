@@ -6,6 +6,18 @@ between minor versions.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-25
+
+### Added
+- `Play all animations in turn` button: writes every movie on the device into
+  the device's playlist (`POST playlist`) and starts it.
+- `Duration per animation` number (configuration, 5–600 s, restored after a
+  restart): how long each movie plays in that playlist.
+
+### Changed
+- `Mode` is a control again, and its `Real time` and `Demo` states say what they
+  do.
+
 ## [0.6.0] - 2026-10-25
 
 ### Added
