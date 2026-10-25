@@ -24,6 +24,9 @@
   },
   "entity": {
     "select": {
+      "animation": {
+        "name": "Animation"
+      },
       "mode": {
         "name": "Mode",
         "state": {
@@ -37,7 +40,7 @@
         }
       },
       "library": {
-        "name": "Library"
+        "name": "Upload from library"
       },
       "delete_movie": {
         "name": "Delete movie"

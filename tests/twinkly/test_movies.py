@@ -19,7 +19,7 @@ from . import setup_integration
 
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-LIBRARY = "select.tree_1_library"
+LIBRARY = "select.tree_1_upload_from_library"
 DELETE = "select.tree_1_delete_movie"
 # The test device: TW2016, 100 LEDs, RGB.
 DEVICE = {"product_code": "TW2016", "number_of_led": 100, "led_profile": "RGB"}

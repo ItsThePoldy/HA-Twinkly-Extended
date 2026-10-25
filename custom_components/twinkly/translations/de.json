@@ -1,0 +1,67 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Gerät ist bereits eingerichtet",
+      "cannot_connect": "Verbindung fehlgeschlagen"
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen"
+    },
+    "flow_title": "{name}",
+    "step": {
+      "discovery_confirm": {
+        "description": "Möchtest du {name} - {model} ({host}) einrichten?"
+      },
+      "user": {
+        "data": {
+          "host": "Host"
+        },
+        "data_description": {
+          "host": "Hostname oder IP-Adresse deines Twinkly-Geräts."
+        }
+      }
+    }
+  },
+  "entity": {
+    "select": {
+      "animation": {
+        "name": "Animation"
+      },
+      "mode": {
+        "name": "Modus",
+        "state": {
+          "color": "Farbe",
+          "demo": "Demo",
+          "effect": "Effekt",
+          "movie": "Hochgeladene Animation",
+          "off": "Aus",
+          "playlist": "Playlist",
+          "rt": "Echtzeit"
+        }
+      },
+      "library": {
+        "name": "Aus Bibliothek laden"
+      },
+      "delete_movie": {
+        "name": "Animation löschen"
+      }
+    },
+    "switch": {
+      "app_mode": {
+        "name": "App-Modus",
+        "state_attributes": {
+          "reason": {
+            "name": "Grund",
+            "state": {
+              "app_mode": "App-Modus",
+              "other_client": "Ein anderer Client nutzt das Gerät"
+            }
+          },
+          "until": {
+            "name": "Pausiert bis"
+          }
+        }
+      }
+    }
+  }
+}

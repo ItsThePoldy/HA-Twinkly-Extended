@@ -92,11 +92,18 @@ client. The integration therefore steps aside:
 
 ## Movies on the device
 
+The device page splits what plays from what is stored. Under **Controls**: the
+light and the **`Animation`** select, which lists the movies saved on the device
+(by name) and then the predefined effects; choosing one plays it and turns the
+device on. A predefined effect named like a movie is listed as `<name> (effect)`.
+Under **Configuration**: `Mode` (the device's raw mode), `App mode`,
+`Upload from library` and `Delete movie`. Entity names are translated to German.
+
 - **`Delete movie` select** (configuration entity): lists the movies saved on the
   device; choosing one deletes it at once, there is no confirmation. The LEDs are
   switched off for the delete and return to their mode afterwards, as the Twinkly
   app does it. Needs firmware 2.7.1 or newer.
-- **`Library` select** — only if a directory is mounted at `/twinkly-library`
+- **`Upload from library` select** — only if a directory is mounted at `/twinkly-library`
   inside Home Assistant. It holds recorded uploads of the Twinkly app, one shelf
   per `<product_code>-<number_of_led>` and one directory per movie with
   `movie.json` (the app's `movies/new` request plus `bytes_per_led`, `size`,
