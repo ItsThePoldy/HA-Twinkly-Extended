@@ -31,12 +31,12 @@
         "name": "Mode",
         "state": {
           "color": "Color",
-          "demo": "Demo",
+          "demo": "Demo (effects in turn)",
           "effect": "Effect",
           "movie": "Uploaded effect",
           "off": "Off",
           "playlist": "Playlist",
-          "rt": "Real time"
+          "rt": "Real time (live stream from app or music)"
         }
       },
       "library": {
@@ -61,6 +61,16 @@
             "name": "Paused until"
           }
         }
+      }
+    },
+    "button": {
+      "play_all": {
+        "name": "Play all animations in turn"
+      }
+    },
+    "number": {
+      "playlist_duration": {
+        "name": "Duration per animation"
       }
     }
   }

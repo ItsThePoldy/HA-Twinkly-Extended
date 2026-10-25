@@ -69,10 +69,9 @@ def _library_labels(coordinator: TwinklyCoordinator) -> dict[str, LibraryMovie]:
 
 
 class TwinklyModeSelect(TwinklyEntity, SelectEntity):
-    """The device's raw mode; which effect or movie plays is chosen in the Animation select."""
+    """The device's mode; which movie or effect plays is chosen in the Animation select."""
 
     _attr_translation_key = "mode"
-    _attr_entity_category = EntityCategory.CONFIG
     _attr_options = TWINKLY_MODES
 
     def __init__(self, coordinator: TwinklyCoordinator) -> None:

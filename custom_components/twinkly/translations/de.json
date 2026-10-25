@@ -31,12 +31,12 @@
         "name": "Modus",
         "state": {
           "color": "Farbe",
-          "demo": "Demo",
+          "demo": "Effekte im Wechsel (Demo)",
           "effect": "Effekt",
           "movie": "Hochgeladene Animation",
           "off": "Aus",
           "playlist": "Playlist",
-          "rt": "Echtzeit"
+          "rt": "Echtzeit (Live-Stream von App/Musik)"
         }
       },
       "library": {
@@ -61,6 +61,16 @@
             "name": "Pausiert bis"
           }
         }
+      }
+    },
+    "button": {
+      "play_all": {
+        "name": "Alle Animationen im Wechsel"
+      }
+    },
+    "number": {
+      "playlist_duration": {
+        "name": "Dauer je Animation"
       }
     }
   }

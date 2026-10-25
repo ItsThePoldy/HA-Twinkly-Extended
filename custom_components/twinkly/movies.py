@@ -154,3 +154,9 @@ async def delete_movie(client: Twinkly, unique_id: str, mode: str | None) -> Non
     finally:
         if mode in RESTORABLE_MODES:
             await client.set_mode(mode)
+
+
+async def write_playlist(client: Twinkly, unique_ids: list[str], duration: int) -> None:
+    """Replace the device's playlist with the given movies, each shown for duration seconds."""
+    entries = [{"unique_id": unique_id, "duration": duration} for unique_id in unique_ids]
+    await device_request(client, "POST", "playlist", json_body={"entries": entries})

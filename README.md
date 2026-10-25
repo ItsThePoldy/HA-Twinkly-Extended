@@ -93,11 +93,16 @@ client. The integration therefore steps aside:
 ## Movies on the device
 
 The device page splits what plays from what is stored. Under **Controls**: the
-light and the **`Animation`** select, which lists the movies saved on the device
-(by name) and then the predefined effects; choosing one plays it and turns the
-device on. A predefined effect named like a movie is listed as `<name> (effect)`.
-Under **Configuration**: `Mode` (the device's raw mode), `App mode`,
-`Upload from library` and `Delete movie`. Entity names are translated to German.
+light (its colour wheel sets a static colour), the **`Animation`** select, which
+lists the movies saved on the device (by name) and then the predefined effects
+(choosing one plays it and turns the device on; a predefined effect named like a
+movie is listed as `<name> (effect)`), **`Mode`** (the device's mode — `Real time`
+shows only what an app or music sync streams live, `Demo` runs the effects in
+turn), and the **`Play all animations in turn`** button, which writes every movie
+on the device into the device's playlist and starts it. Under **Configuration**:
+`App mode`, `Duration per animation` (seconds each movie plays in that playlist,
+kept across restarts), `Upload from library` and `Delete movie`. Entity names are
+translated to German.
 
 - **`Delete movie` select** (configuration entity): lists the movies saved on the
   device; choosing one deletes it at once, there is no confirmation. The LEDs are

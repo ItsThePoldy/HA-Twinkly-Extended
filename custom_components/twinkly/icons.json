@@ -18,6 +18,16 @@
       "animation": {
         "default": "mdi:animation-play"
       }
+    },
+    "button": {
+      "play_all": {
+        "default": "mdi:play-box-multiple"
+      }
+    },
+    "number": {
+      "playlist_duration": {
+        "default": "mdi:timer-outline"
+      }
     }
   }
 }

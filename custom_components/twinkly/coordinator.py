@@ -99,6 +99,8 @@ class TwinklyCoordinator(DataUpdateCoordinator[TwinklyData]):
     predefined_effect_ids: list[str] | None = None
     supports_predefined_effects: bool = False
     library_mounted: bool = False
+    # Seconds per movie in the playlist the play-all button writes; set by its number entity.
+    playlist_duration: int = 30
 
     def __init__(
         self, hass: HomeAssistant, config_entry: TwinklyConfigEntry, client: Twinkly

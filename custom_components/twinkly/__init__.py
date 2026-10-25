@@ -13,7 +13,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .const import DEVICE_TIMEOUT, DOMAIN
 from .coordinator import TwinklyConfigEntry, TwinklyCoordinator
 
-PLATFORMS = [Platform.LIGHT, Platform.SELECT, Platform.SWITCH]
+PLATFORMS = [Platform.BUTTON, Platform.LIGHT, Platform.NUMBER, Platform.SELECT, Platform.SWITCH]
 
 _LOGGER = logging.getLogger(__name__)
 

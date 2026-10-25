@@ -96,11 +96,11 @@ async def test_choosing_an_effect_plays_it_without_turning_on_again(
 
 
 @pytest.mark.usefixtures("mock_twinkly_client")
-async def test_controls_hold_light_and_animation_storage_is_configuration(
+async def test_controls_hold_what_plays_and_configuration_what_is_stored(
     hass: HomeAssistant, mock_config_entry: MockConfigEntry, entity_registry: er.EntityRegistry, tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Steuerung: the light and Animation; Konfiguration: mode, app mode, library, delete."""
+    """Steuerung: light, Animation, Mode, play all; Konfiguration: app mode, duration, library, delete."""
     from custom_components.twinkly import movies
 
     monkeypatch.setattr(movies, "LIBRARY_DIR", tmp_path)
@@ -113,7 +113,9 @@ async def test_controls_hold_light_and_animation_storage_is_configuration(
     assert categories == {
         "light": None,
         "animation": None,
-        "mode": EntityCategory.CONFIG,
+        "mode": None,
+        "play_all": None,
+        "playlist_duration": EntityCategory.CONFIG,
         "library": EntityCategory.CONFIG,
         "delete_movie": EntityCategory.CONFIG,
         "app_mode": EntityCategory.CONFIG,
