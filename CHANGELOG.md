@@ -6,6 +6,15 @@ between minor versions.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-25
+
+### Added
+- `Delete movie` select: deletes a movie saved on the device, in the Twinkly
+  app's order (LEDs off, `DELETE movies/<unique_id>`, back to the previous mode).
+- `Library` select, when `/twinkly-library` is mounted: plays a recorded movie,
+  uploading it first (`movies/new` + `movies/full`) if the device does not have
+  it. Refuses damaged recordings and uploads that do not fit the free frames.
+
 ## [0.4.0] - 2026-10-25
 
 ### Added
